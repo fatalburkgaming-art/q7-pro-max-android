@@ -1,37 +1,38 @@
+
 name: Build Q7 Pro Max APK
 
 on:
   push:
-    paths:
-      - '.github/workflows/build.yml'
-      - 'Q7ProMax-Android-OnlineBuild.zip'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Download project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Extract ZIP
-        run: |
-          unzip -o Q7ProMax-Android-OnlineBuild.zip -d project
-          find project -maxdepth 3 -type f
+        run: unzip -o Q7ProMax-Android-OnlineBuild.zip -d project
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
       - name: Build APK
-        run: |
-          cd project/Q7ProMax-Android
-          chmod +x gradlew
-          ./gradlew assembleDebug
+        run: gradle assembleDebug
+        working-directory: project/Q7ProMax-Android
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Q7-Pro-Max-APK
-          path: project/Q7ProMax-Android/**/build/outputs/apk/debug/*.apk
+          path: project/Q7ProMax-Android/app/build/outputs/apk/debug/*.apk
+          
